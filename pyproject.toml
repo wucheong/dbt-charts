@@ -32,6 +32,7 @@ dev = [
     # and would compile from source (minutes); the Windows subset needs no Athena.
     "dbt-athena==1.10.2; sys_platform != 'win32'",  # Athena adapter tests
     "dbt-clickhouse==1.10.3",  # ClickHouse adapter tests
+    "dbt-starrocks==1.12.2",  # StarRocks adapter tests
     "dbt-sqlserver==1.11.0",  # SQL Server adapter tests (needs dbt-adapters>=1.24.1)
     "dbt-fabric==1.10.0",  # Fabric adapter tests
     "google-cloud-bigquery>=3.33.0",  # BigQuery warehouse-check tests
@@ -195,6 +196,13 @@ athena = [
 
 clickhouse = [
     "dbt-clickhouse>=1.10,<2.0",
+]
+
+# dbt-starrocks is the community adapter for StarRocks: it speaks the MySQL
+# wire protocol on port 9030, so it needs mysql-connector-python rather than
+# a warehouse-specific driver.
+starrocks = [
+    "dbt-starrocks>=1.12,<2.0",
 ]
 
 # dbt-sqlserver 1.12 made its drivers extras, and its default backend is

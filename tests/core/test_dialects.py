@@ -677,6 +677,7 @@ class TestDialectRegistry:
             "presto",
             "trino",
             "clickhouse",
+            "starrocks",
         ]
         for key in expected_keys:
             assert key in DIALECTS, f"Missing dialect: {key}"

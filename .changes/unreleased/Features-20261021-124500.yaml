@@ -1,0 +1,7 @@
+kind: Features
+body: StarRocks is now a supported warehouse. A `type: starrocks` source connects through
+  the `dbt-starrocks` adapter over the MySQL wire protocol, and ships as the `starrocks`
+  extra.
+time: 2026-10-21T12:45:00.000000-07:00
+custom:
+    DbtChartsIssue: "0"

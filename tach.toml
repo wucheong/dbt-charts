@@ -79,6 +79,13 @@ exclude = [
     # does not read. Imported by `execute/drivers/trino.py`, loaded lazily by
     # `open_driver` like the lake compute driver above.
     "trino",
+    # `mysql-connector-python` is declared in [project.optional-dependencies]
+    # starrocks, which tach does not read. It is the driver dbt-starrocks
+    # connects with, and the StarRocks live test imports it directly to set up
+    # its scratch database and SELECT-only user.
+    # Tach normalizes the PyPI name: `mysql-connector-python` →
+    # `mysql_connector_python`.
+    "mysql_connector_python",
     # `google-cloud-bigquery` is declared in [project.optional-dependencies]
     # bigquery (tach 0.35.0 only reads [project] dependencies, not optional-deps).
     # Imported lazily in _SourcePool._ensure_connected when type==bigquery.

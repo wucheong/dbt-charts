@@ -314,6 +314,10 @@ EXPECTED_CLASSIFICATION = {
     "presto": False,
     "trino": False,
     "clickhouse": True,
+    # StarRocks speaks the MySQL wire protocol and follows MySQL's string
+    # literal grammar: a backslash escapes the next character, and doubling
+    # the quote is not the only way to embed one.
+    "starrocks": True,
 }
 BACKSLASH_ESCAPING = sorted(k for k, v in EXPECTED_CLASSIFICATION.items() if v)
 ANSI_LITERALS = sorted(k for k, v in EXPECTED_CLASSIFICATION.items() if not v)

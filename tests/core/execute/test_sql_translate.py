@@ -178,7 +178,7 @@ def test_week_truncation_keeps_monday_weeks_on_bigquery() -> None:
 
 
 @pytest.mark.parametrize(
-    "write", ["postgres", "redshift", "databricks", "trino", "athena"]
+    "write", ["postgres", "redshift", "databricks", "trino", "athena", "starrocks"]
 )
 def test_week_truncation_is_unchanged_on_monday_native_targets(write: str) -> None:
     out = translate_sql("select date_trunc('week', ts) from t", "duckdb", write)

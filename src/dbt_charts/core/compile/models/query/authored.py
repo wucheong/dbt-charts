@@ -65,6 +65,7 @@ QueryDialect = Literal[
     "spark",
     "sqlite",
     "sqlserver",
+    "starrocks",
     "trino",
 ]
 

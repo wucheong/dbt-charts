@@ -1348,6 +1348,109 @@ class TrinoSourceConfig(AttributedSourceConfig, DatabaseSourceConfig, Constraine
     ] = None
 
 
+class StarRocksSourceConfig(AttributedSourceConfig, DatabaseSourceConfig):
+    """StarRocks source configuration.
+
+    StarRocks speaks the MySQL wire protocol on the query port (9030), and
+    dbt-starrocks drives it with mysql-connector-python. The fields are the
+    keys of a dbt `type: starrocks` profile target, so a `dbt_profile` source
+    maps onto this model one-to-one.
+
+    StarRocks calls a database a *database* and dbt calls the same thing a
+    *schema*, so `schema` here names the StarRocks database (`gaming_ops`), and
+    `catalog` names the catalog that holds it (`default_catalog`, or an
+    external catalog such as a Hive one). The adapter refuses a `database` that
+    disagrees with `schema`, so there is no `database` field to set.
+
+    Read-only posture: no native driver flag. Bind a SELECT-only user to the
+    dbt profile credential at the StarRocks level.
+    """
+
+    source_category: ClassVar[str] = "database"
+    type: Literal["starrocks"] = Field(description="Source type identifier.")
+    host: str = Field(description="StarRocks FE host name.")
+    port: int = Field(default=9030, description="StarRocks FE query port number.")
+    catalog: str = Field(
+        default="default_catalog",
+        description="Catalog holding the database. `default_catalog` is the "
+        "built-in one; an external catalog (hive, iceberg) is named here.",
+    )
+    schema_: str = Field(
+        alias="schema",
+        description="StarRocks database to query (dbt calls it the schema).",
+    )
+    username: str = Field(
+        description="User name to connect with. dbt-starrocks spells this "
+        "`username`, not `user`."
+    )
+    password: str = Field(description="Password to authenticate with.")
+    charset: str | None = Field(
+        default=None, description="Character set for the connection."
+    )
+    version: str | None = Field(
+        default=None,
+        description="StarRocks server version, e.g. `3.3.9`. Omit it to have "
+        "the adapter read it from the server.",
+    )
+    use_pure: Annotated[
+        str | bool | None,
+        Field(
+            description="Use mysql-connector-python's pure-Python "
+            "implementation instead of its C extension. The adapter reads the "
+            "string `true`; a YAML boolean is normalized to that spelling."
+        ),
+    ] = None
+    is_async: Annotated[
+        bool,
+        Field(
+            description="Submit suitable statements as StarRocks ETL tasks "
+            "instead of running them inline."
+        ),
+    ] = False
+    async_query_timeout: Annotated[
+        int,
+        Field(
+            gt=0,
+            description="`query_timeout` applied to a statement submitted as an "
+            "ETL task, in seconds.",
+        ),
+    ] = 300
+    poll_interval: Annotated[
+        int,
+        Field(gt=0, description="Base delay in seconds between ETL task status polls."),
+    ] = 1
+    poll_max_delay: Annotated[
+        int,
+        Field(gt=0, description="Maximum delay cap in seconds for ETL task polling."),
+    ] = 600
+    poll_factor: Annotated[
+        float,
+        Field(gt=0, description="Growth multiplier for ETL task polling backoff."),
+    ] = 2.0
+    auth_plugin: Annotated[
+        str,
+        Field(description="mysql-connector-python authentication plugin to use."),
+    ] = ""
+
+    @field_validator("use_pure", mode="before")
+    @classmethod
+    def _spell_use_pure_as_string(
+        cls,
+        value: object,  # type-state: object_annotation — raw authored value
+    ) -> object:  # type-state: object_annotation — the same value, as a string
+        """Spell a YAML boolean the way dbt-starrocks reads it.
+
+        The adapter tests ``use_pure in ["true", "True"]``, so the boolean
+        YAML's ``true`` becomes a Python ``True`` and is silently ignored —
+        the pure-Python connector is then never used and the author has no
+        way to tell. Spelling it as the string the adapter looks for is what
+        the author meant.
+        """
+        if isinstance(value, bool):
+            return "true" if value else "false"
+        return value
+
+
 # dbt-duckdb fields that need its own connection lifecycle (plugin hooks, fsspec
 # registration, remote transport), which the in-process adapter does not implement.
 UNSUPPORTED_DUCKDB_FIELDS = frozenset(
@@ -1877,6 +1980,7 @@ SourceConfig = (
     | RedshiftSourceConfig
     | DatabricksSourceConfig
     | TrinoSourceConfig
+    | StarRocksSourceConfig
     | DuckDBSourceConfig
     | SQLiteSourceConfig
     | CsvSourceConfig

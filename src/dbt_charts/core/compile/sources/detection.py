@@ -149,6 +149,22 @@ DB_INFO_MAP: dict[str, dict[str, str]] = {
         ),
         "notes": "SQL Server supports information_schema and sp_help procedures.",
     },
+    "starrocks": {
+        "type": "starrocks",
+        "engine": "StarRocks",
+        "dialect": "StarRocks SQL (MySQL protocol)",
+        "introspection": (
+            "List tables: `SHOW TABLES FROM database_name;` | "
+            "Describe table: `DESCRIBE database_name.table_name;` | "
+            "Columns: `SELECT column_name, data_type FROM information_schema.columns "
+            "WHERE table_schema = 'database_name';`"
+        ),
+        "notes": (
+            "StarRocks has one namespace level: the dbt `schema` is the "
+            "StarRocks database. `information_schema.columns` lists every "
+            "column of the connected catalog."
+        ),
+    },
 }
 
 

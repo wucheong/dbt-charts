@@ -30,6 +30,9 @@ The rest of ``_ADAPTER_TYPE_MAP`` is absent for five different reasons:
 - **SQL Server** — dbt-sqlserver hard-codes ``APP=dbt-sqlserver/<version>`` into
   the connection string and exposes no credential to change it, so there is
   nothing to fill. The query comment still carries attribution.
+- **StarRocks** — its MySQL-protocol handshake carries no session-identifying
+  field the adapter exposes as a credential, so there is nothing to fill. The
+  query comment still carries attribution.
 - **DuckDB and Spark** — DuckDB runs in-process, with no session to identify. Spark
   was never assessed; if someone adds it, that is a new decision to make rather than
   one already taken here.

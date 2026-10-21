@@ -64,6 +64,7 @@ _MONDAY_WEEK_DIALECTS = frozenset(
         "redshift",
         "databricks",
         "spark",
+        "starrocks",
         "trino",
         "presto",
         "athena",

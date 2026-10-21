@@ -85,6 +85,12 @@ _ADAPTER_TYPE_MAP: dict[str, tuple[str, str, str, str | None]] = {
         "ClickHouseCredentials",
         "clickhouse",
     ),
+    "starrocks": (
+        "dbt.adapters.starrocks",
+        "StarRocksAdapter",
+        "StarRocksCredentials",
+        "starrocks",
+    ),
     "sqlserver": (
         "dbt.adapters.sqlserver",
         "SQLServerAdapter",

@@ -15,6 +15,7 @@ from dbt_charts.core.compile.models.source import (
     PostgresSourceConfig,
     RedshiftSourceConfig,
     SnowflakeSourceConfig,
+    StarRocksSourceConfig,
     TrinoSourceConfig,
 )
 
@@ -189,6 +190,55 @@ class TestDatabaseSourceConfigContracts:
         )
         assert config.method == "kerberos"
 
+    def test_starrocks_documents_every_dbt_credential_option(self) -> None:
+        """StarRocks options round-trip through the typed source model."""
+        config = StarRocksSourceConfig(
+            type="starrocks",
+            host="fe.example.com",
+            port=9030,
+            catalog="default_catalog",
+            schema="gaming_ops",
+            username="reader",
+            password="password",
+            charset="utf8mb4",
+            version="3.3.9",
+            use_pure="true",
+            is_async=True,
+            async_query_timeout=600,
+            poll_interval=5,
+            poll_max_delay=60,
+            poll_factor=1.5,
+            auth_plugin="mysql_native_password",
+        )
+        assert config.schema_ == "gaming_ops"
+        assert config.use_pure == "true"
+
+    def test_starrocks_spells_use_pure_the_way_the_adapter_reads_it(self) -> None:
+        """dbt-starrocks tests ``use_pure in ["true", "True"]``, so a YAML
+        boolean would be dropped without a word."""
+        config = StarRocksSourceConfig(
+            type="starrocks",
+            host="fe.example.com",
+            username="reader",
+            password="password",
+            schema="gaming_ops",
+            use_pure=True,
+        )
+        assert config.use_pure == "true"
+
+    def test_starrocks_rejects_a_database_that_disagrees_with_the_schema(self) -> None:
+        """The adapter refuses a ``database`` that differs from ``schema``;
+        there is no field to set one."""
+        with pytest.raises(ValidationError, match="extra_forbidden"):
+            StarRocksSourceConfig(
+                type="starrocks",
+                host="fe.example.com",
+                username="reader",
+                password="password",
+                schema="gaming_ops",
+                database="something_else",
+            )
+
     def test_duckdb_documents_every_dbt_credential_option(self) -> None:
         """DuckDB options round-trip through the typed source model."""
         config = DuckDBSourceConfig(
@@ -343,6 +393,16 @@ class TestDatabaseSourceConfigContracts:
             (
                 TrinoSourceConfig,
                 {"type": "trino", "host": "h", "catalog": "c", "schema": "s"},
+            ),
+            (
+                StarRocksSourceConfig,
+                {
+                    "type": "starrocks",
+                    "host": "h",
+                    "username": "u",
+                    "password": "p",
+                    "schema": "s",
+                },
             ),
             (DuckDBSourceConfig, {"type": "duckdb"}),
         ],

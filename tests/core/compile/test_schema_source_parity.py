@@ -93,6 +93,13 @@ def test_parse_source_config_accepts_all_union_member_types():
             "user": "u",
             "schema": "sc",
         },
+        "starrocks": {
+            "host": "h",
+            "port": 9030,
+            "username": "u",
+            "password": "p",
+            "schema": "sc",
+        },
         "databricks": {
             "host": "h.cloud.databricks.com",
             "http_path": "/sql/1.0/warehouses/abc",

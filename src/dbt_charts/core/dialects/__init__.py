@@ -27,6 +27,7 @@ from dbt_charts.core.dialects.redshift import RedshiftDialect
 from dbt_charts.core.dialects.snowflake import SnowflakeDialect
 from dbt_charts.core.dialects.sqlite import SQLiteDialect
 from dbt_charts.core.dialects.sqlserver import SQLServerDialect
+from dbt_charts.core.dialects.starrocks import StarRocksDialect
 from dbt_charts.core.dialects.trino import TrinoDialect
 
 # Singleton instances for each dialect
@@ -44,6 +45,7 @@ _clickhouse_dialect = ClickHouseDialect()
 _sqlite_dialect = SQLiteDialect()
 _lakecompute_dialect = LakeComputeDialect()
 _trino_dialect = TrinoDialect()
+_starrocks_dialect = StarRocksDialect()
 
 # Registry mapping profile types to dialect instances
 DIALECTS: dict[str, SQLDialect] = {
@@ -80,6 +82,8 @@ DIALECTS: dict[str, SQLDialect] = {
     "clickhouse": _clickhouse_dialect,
     # Lake compute (DuckDB's SQL over dbt's ADBC driver)
     "lakecompute": _lakecompute_dialect,
+    # StarRocks (MySQL wire protocol on the query port)
+    "starrocks": _starrocks_dialect,
 }
 
 
@@ -139,6 +143,7 @@ __all__ = [
     "DatabricksDialect",
     "AthenaDialect",
     "ClickHouseDialect",
+    "StarRocksDialect",
     # Registry
     "DIALECTS",
     "get_dialect",

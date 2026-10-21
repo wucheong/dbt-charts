@@ -492,7 +492,7 @@ Then in a board: `source: warehouse` at the root (default for every `sql` query)
 
 **Inside a dbt project, `sources:` is optional.** When `dbt_project.yml` sits at the project root and `dbt_charts.yml` declares no `sources:` (or does not exist), dbt charts adds one source named after the project's `profile:`, as if you had written `<profile>: {type: dbt_profile}`. Every SQL query that names no `source:` (query, board root, or `meta.yml`) runs against it. Declaring any `sources:` turns it off, and sourceless SQL is then an `ERR-SOURCE-NOT-NAMED` error; so is sourceless SQL outside a dbt project, or in a `dbt_project.yml` with no `profile:` (a dbt package).
 
-Types: `dbt_profile`, `postgres`, `snowflake`, `bigquery`, `redshift`, `trino`, `duckdb`, `sqlite`, `csv`, `json`, `parquet`, `http`.
+Types: `dbt_profile`, `postgres`, `snowflake`, `bigquery`, `redshift`, `starrocks`, `trino`, `duckdb`, `sqlite`, `csv`, `json`, `parquet`, `http`.
 
 **Local-only types.** `duckdb` and `sqlite` read a file on the machine running `dct`. dbt charts Cloud connects only to `bigquery`, `postgresql` (Cloud's spelling of `postgres`), `redshift`, and `snowflake` — it never reads a `.duckdb` file from a repo, committed or not. For Cloud, load the tables into one of those warehouses, or export each table to a Parquet/CSV/JSON file committed in the repo and register it once under `sources:` (`type: csv | json | parquet`, a `files:` map, paths relative to the project root); every query then references the source by name, and it renders identically locally and on Cloud with no connection step. A board that is the only reader of one file can skip the registry and point at it inline: `source: <path>` resolves against the board's own directory or the project root, whichever exists (`source: ../data/orders.parquet` from `charts/`, or `source: data/orders.parquet` from any board depth). Both existing at once is a compile error naming both.
 
@@ -591,7 +591,8 @@ Schema fields: `schema`, `table`, `column`, `fields` (project result rows to exa
 
 Connection source types (named in the project root `dbt_charts.yml`'s `sources:`
 registry — never inline in a board): `postgres`, `snowflake`, `bigquery`,
-`redshift`, `trino`, `duckdb`, `sqlite`, `csv`, `json`, `parquet`, `http`, `dbt_profile`.
+`redshift`, `starrocks`, `trino`, `duckdb`, `sqlite`, `csv`, `json`, `parquet`,
+`http`, `dbt_profile`.
 CSV/JSON/Parquet may instead be referenced inline as a `source:` file path
 without a registry entry — see the example above.
 

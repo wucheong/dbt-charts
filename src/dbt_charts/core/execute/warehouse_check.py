@@ -12,6 +12,7 @@ the SQL instead would report failures the real render never produces.
 | csv/json/parquet | ``DESCRIBE``  | columns only        |
 | bigquery         | dry run       | validity + columns |
 | sqlserver        | describe DMV  | validity + columns |
+| starrocks        | ``EXPLAIN``   | validity only      |
 | postgres         | ``EXPLAIN``   | validity only      |
 | redshift         | ``EXPLAIN``   | validity only      |
 | snowflake        | ``EXPLAIN``   | validity only      |
@@ -130,6 +131,11 @@ _PREFIX_CHECKS: dict[str, _PrefixCheck] = {
     # query (an unknown column is a rejection, not a plan note), so the row is
     # the result schema exactly as on DuckDB.
     "clickhouse": _PrefixCheck("DESCRIBE", ("name", "type")),
+    # StarRocks' DESCRIBE of a SELECT returns an EXPLAIN plan, not the
+    # result schema, so the same prefix would read a plan and report no
+    # columns. Its EXPLAIN does fail the statement when the query does not
+    # bind, which is what a validity check needs.
+    "starrocks": _PrefixCheck("EXPLAIN", None),
     "postgres": _PrefixCheck("EXPLAIN", None),
     "redshift": _PrefixCheck("EXPLAIN", None),
     "snowflake": _PrefixCheck("EXPLAIN", None),
